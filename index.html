@@ -1,0 +1,1303 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>НЕЙРО-ФИТНЕС — ИИ-тренажёр для когнитивного долголетия</title>
+<style>
+  :root{
+    --primary:#1a4d8f;
+    --primary-dark:#0f3260;
+    --accent:#00b8a9;
+    --accent-2:#7c4dff;
+    --bg:#f5f8fc;
+    --card:#ffffff;
+    --text:#1e2a3a;
+    --muted:#5a6b7f;
+    --shadow:0 8px 30px rgba(20,50,90,.10);
+    --radius:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;scroll-padding-top:90px;}
+  body{
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    line-height:1.65;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none;}
+  button{font-family:inherit;}
+
+  /* ===== HEADER ===== */
+  header{
+    position:fixed;top:0;left:0;right:0;z-index:1000;
+    background:rgba(255,255,255,.9);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(26,77,143,.08);
+    transition:box-shadow .3s;
+  }
+  header.scrolled{box-shadow:0 4px 20px rgba(20,50,90,.08);}
+  .nav{
+    max-width:1200px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 24px;
+  }
+  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem;color:var(--primary);cursor:pointer;}
+  .logo-icon{
+    width:38px;height:38px;border-radius:10px;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    display:grid;place-items:center;color:#fff;font-size:1.2rem;
+  }
+  .nav-links{display:flex;gap:26px;font-size:.95rem;font-weight:500;}
+  .nav-links a{color:var(--muted);transition:color .2s;position:relative;cursor:pointer;}
+  .nav-links a:hover{color:var(--primary);}
+  .nav-links a::after{
+    content:'';position:absolute;bottom:-6px;left:0;width:0;height:2px;
+    background:var(--accent);transition:width .25s;
+  }
+  .nav-links a:hover::after{width:100%;}
+  .btn{
+    display:inline-block;padding:12px 26px;border-radius:50px;
+    font-weight:600;font-size:.95rem;cursor:pointer;border:none;
+    transition:transform .2s, box-shadow .2s, background .2s;
+  }
+  .btn-primary{
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    color:#fff;box-shadow:0 6px 20px rgba(26,77,143,.3);
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(26,77,143,.4);}
+  .btn-outline{
+    background:transparent;border:2px solid var(--primary);color:var(--primary);
+  }
+  .btn-outline:hover{background:var(--primary);color:#fff;}
+  .burger{display:none;flex-direction:column;gap:5px;cursor:pointer;background:none;border:none;}
+  .burger span{width:26px;height:3px;background:var(--primary);border-radius:2px;transition:.3s;}
+  .burger.open span:nth-child(1){transform:translateY(8px) rotate(45deg);}
+  .burger.open span:nth-child(2){opacity:0;}
+  .burger.open span:nth-child(3){transform:translateY(-8px) rotate(-45deg);}
+
+  /* ===== HERO ===== */
+  .hero{
+    min-height:100vh;display:flex;align-items:center;
+    padding:120px 24px 60px;
+    background:
+      radial-gradient(circle at 15% 20%, rgba(0,184,169,.12), transparent 45%),
+      radial-gradient(circle at 85% 75%, rgba(124,77,255,.12), transparent 45%),
+      linear-gradient(180deg,#eef4fb 0%,#f5f8fc 100%);
+    position:relative;overflow:hidden;
+  }
+  .hero-inner{
+    max-width:1200px;margin:0 auto;width:100%;
+    display:grid;grid-template-columns:1.1fr .9fr;gap:60px;align-items:center;
+  }
+  .badge{
+    display:inline-flex;align-items:center;gap:8px;
+    background:rgba(0,184,169,.12);color:#007a70;
+    padding:8px 18px;border-radius:50px;font-size:.85rem;font-weight:600;
+    margin-bottom:22px;
+  }
+  .hero h1{
+    font-size:clamp(2rem,4.2vw,3.2rem);
+    line-height:1.15;font-weight:800;color:var(--primary-dark);
+    margin-bottom:22px;
+  }
+  .hero h1 span{
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .hero p{font-size:1.1rem;color:var(--muted);margin-bottom:32px;max-width:560px;}
+  .hero-btns{display:flex;gap:16px;flex-wrap:wrap;}
+  .hero-stats{display:flex;gap:36px;margin-top:44px;flex-wrap:wrap;}
+  .stat b{display:block;font-size:1.7rem;color:var(--primary);font-weight:800;}
+  .stat span{font-size:.85rem;color:var(--muted);}
+
+  .brain-visual{position:relative;display:grid;place-items:center;}
+  .brain-circle{
+    width:min(420px,80vw);height:min(420px,80vw);border-radius:50%;
+    background:linear-gradient(135deg,rgba(26,77,143,.08),rgba(0,184,169,.12));
+    display:grid;place-items:center;position:relative;
+    animation:float 6s ease-in-out infinite;
+  }
+  .brain-emoji{font-size:clamp(6rem,14vw,10rem);filter:drop-shadow(0 20px 40px rgba(26,77,143,.25));}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-18px)}}
+  .orbit{position:absolute;border-radius:50%;border:2px dashed rgba(26,77,143,.18);animation:spin 22s linear infinite;}
+  .orbit.o1{width:100%;height:100%;}
+  .orbit.o2{width:78%;height:78%;animation-duration:16s;animation-direction:reverse;border-color:rgba(0,184,169,.22);}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .orbit-dot{
+    position:absolute;top:-8px;left:50%;transform:translateX(-50%);
+    width:16px;height:16px;border-radius:50%;
+    background:var(--accent);box-shadow:0 0 16px var(--accent);
+  }
+  .orbit.o2 .orbit-dot{background:var(--accent-2);box-shadow:0 0 16px var(--accent-2);}
+
+  /* ===== SECTIONS ===== */
+  section{padding:90px 24px;}
+  .container{max-width:1200px;margin:0 auto;}
+  .section-head{text-align:center;max-width:760px;margin:0 auto 56px;}
+  .section-head .tag{
+    display:inline-block;font-size:.8rem;font-weight:700;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--accent);margin-bottom:12px;
+  }
+  .section-head h2{
+    font-size:clamp(1.6rem,3.2vw,2.4rem);font-weight:800;
+    color:var(--primary-dark);margin-bottom:16px;
+  }
+  .section-head p{color:var(--muted);font-size:1.05rem;}
+
+  .grid{display:grid;gap:24px;}
+  .grid-3{grid-template-columns:repeat(3,1fr);}
+  .grid-2{grid-template-columns:repeat(2,1fr);}
+  .card{
+    background:var(--card);border-radius:var(--radius);
+    padding:32px;box-shadow:var(--shadow);
+    border:1px solid rgba(26,77,143,.06);
+    transition:transform .3s, box-shadow .3s;
+  }
+  .card:hover{transform:translateY(-6px);box-shadow:0 16px 44px rgba(20,50,90,.14);}
+  .card-icon{
+    width:54px;height:54px;border-radius:14px;display:grid;place-items:center;
+    font-size:1.5rem;margin-bottom:18px;
+    background:linear-gradient(135deg,rgba(26,77,143,.1),rgba(0,184,169,.14));
+  }
+  .card h3{font-size:1.15rem;margin-bottom:10px;color:var(--primary-dark);}
+  .card p{color:var(--muted);font-size:.95rem;}
+
+  /* Кликабельные карточки */
+  .card.clickable{cursor:pointer;position:relative;}
+  .card.clickable::after{
+    content:'Подробнее →';display:block;margin-top:16px;
+    font-size:.85rem;font-weight:700;color:var(--accent);
+    transition:transform .2s;
+  }
+  .card.clickable:hover::after{transform:translateX(6px);}
+
+  /* Functions table */
+  .func-table{width:100%;border-collapse:separate;border-spacing:0 10px;}
+  .func-table th{
+    text-align:left;padding:14px 20px;font-size:.8rem;text-transform:uppercase;
+    letter-spacing:.06em;color:var(--muted);font-weight:700;
+  }
+  .func-table td{
+    background:var(--card);padding:18px 20px;font-size:.95rem;
+    border-top:1px solid rgba(26,77,143,.06);
+    border-bottom:1px solid rgba(26,77,143,.06);
+    cursor:pointer;
+  }
+  .func-table tr td:first-child{
+    border-left:1px solid rgba(26,77,143,.06);
+    border-radius:12px 0 0 12px;font-weight:700;color:var(--primary);
+    width:60px;text-align:center;
+  }
+  .func-table tr td:last-child{
+    border-right:1px solid rgba(26,77,143,.06);
+    border-radius:0 12px 12px 0;color:var(--muted);
+  }
+  .func-table tr td:nth-child(2){font-weight:600;color:var(--primary-dark);}
+  .func-table tr:hover td{background:#f0f6ff;transition:background .2s;}
+
+  /* Architecture */
+  .arch{display:grid;gap:18px;}
+  .arch-layer{
+    background:var(--card);border-radius:14px;padding:22px 26px;
+    box-shadow:var(--shadow);display:flex;align-items:center;gap:18px;
+    border-left:5px solid var(--primary);
+    transition:transform .25s;cursor:pointer;
+  }
+  .arch-layer:hover{transform:translateX(8px);}
+  .arch-layer:nth-child(2){border-left-color:var(--accent);}
+  .arch-layer:nth-child(3){border-left-color:var(--accent-2);}
+  .arch-layer:nth-child(4){border-left-color:#ff9800;}
+  .arch-layer:nth-child(5){border-left-color:#e91e63;}
+  .arch-layer:nth-child(6){border-left-color:#009688;}
+  .arch-layer:nth-child(7){border-left-color:#607d8b;}
+  .arch-num{
+    min-width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    color:#fff;font-weight:800;font-size:1.1rem;
+  }
+  .arch-layer h4{font-size:1.05rem;color:var(--primary-dark);margin-bottom:2px;}
+  .arch-layer p{font-size:.9rem;color:var(--muted);}
+
+  /* Scenarios */
+  .scenario{
+    background:var(--card);border-radius:var(--radius);padding:30px;
+    box-shadow:var(--shadow);border-top:4px solid var(--accent);
+    transition:transform .3s;cursor:pointer;
+  }
+  .scenario:hover{transform:translateY(-6px);}
+  .scenario .num{font-size:2.4rem;font-weight:800;color:rgba(26,77,143,.12);line-height:1;}
+  .scenario h3{font-size:1.1rem;color:var(--primary-dark);margin:10px 0 10px;}
+  .scenario p{font-size:.93rem;color:var(--muted);}
+  .scenario .more{
+    display:inline-block;margin-top:14px;font-size:.85rem;font-weight:700;
+    color:var(--accent);
+  }
+
+  /* Timeline */
+  .timeline{position:relative;padding-left:34px;}
+  .timeline::before{
+    content:'';position:absolute;left:10px;top:6px;bottom:6px;width:3px;
+    background:linear-gradient(180deg,var(--primary),var(--accent));border-radius:3px;
+  }
+  .tl-item{position:relative;margin-bottom:26px;cursor:pointer;padding:6px 0;transition:transform .2s;}
+  .tl-item:hover{transform:translateX(6px);}
+  .tl-item::before{
+    content:'';position:absolute;left:-30px;top:12px;width:14px;height:14px;
+    border-radius:50%;background:#fff;border:3px solid var(--primary);
+    transition:background .2s, transform .2s;
+  }
+  .tl-item:hover::before{background:var(--accent);transform:scale(1.15);}
+  .tl-item h4{font-size:1rem;color:var(--primary-dark);margin-bottom:4px;}
+  .tl-item p{font-size:.9rem;color:var(--muted);}
+  .tl-item .term{
+    display:inline-block;font-size:.78rem;font-weight:700;color:var(--accent);
+    background:rgba(0,184,169,.1);padding:3px 10px;border-radius:20px;margin-left:8px;
+  }
+
+  /* Effects */
+  .effect-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+  .effect{
+    background:var(--card);border-radius:14px;padding:24px;
+    box-shadow:var(--shadow);display:flex;gap:16px;align-items:flex-start;
+    cursor:pointer;transition:transform .25s;
+  }
+  .effect:hover{transform:translateY(-4px);}
+  .effect .ico{
+    min-width:44px;height:44px;border-radius:12px;display:grid;place-items:center;
+    background:linear-gradient(135deg,rgba(0,184,169,.14),rgba(26,77,143,.1));
+    font-size:1.3rem;
+  }
+  .effect b{display:block;font-size:1.35rem;color:var(--primary);font-weight:800;}
+  .effect span{font-size:.9rem;color:var(--muted);}
+
+  /* CTA */
+  .cta{
+    background:linear-gradient(135deg,var(--primary-dark),var(--primary) 60%,var(--accent));
+    border-radius:28px;padding:60px 40px;text-align:center;color:#fff;
+    position:relative;overflow:hidden;
+  }
+  .cta::before{
+    content:'';position:absolute;top:-60px;right:-60px;width:220px;height:220px;
+    border-radius:50%;background:rgba(255,255,255,.08);
+  }
+  .cta::after{
+    content:'';position:absolute;bottom:-80px;left:-40px;width:260px;height:260px;
+    border-radius:50%;background:rgba(255,255,255,.06);
+  }
+  .cta h2{font-size:clamp(1.5rem,3vw,2.2rem);margin-bottom:16px;position:relative;}
+  .cta p{opacity:.9;max-width:620px;margin:0 auto 30px;position:relative;}
+  .cta .btn{position:relative;background:#fff;color:var(--primary);}
+  .cta .btn:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(0,0,0,.25);}
+
+  /* Footer */
+  footer{background:#0d1b2e;color:#a8b6c8;padding:50px 24px 30px;}
+  .footer-inner{
+    max-width:1200px;margin:0 auto;
+    display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:40px;
+  }
+  footer h4{color:#fff;font-size:1rem;margin-bottom:16px;}
+  footer p, footer li{font-size:.9rem;line-height:1.9;}
+  footer ul{list-style:none;}
+  footer a{cursor:pointer;transition:color .2s;}
+  footer a:hover{color:var(--accent);}
+  .footer-bottom{
+    max-width:1200px;margin:36px auto 0;padding-top:22px;
+    border-top:1px solid rgba(255,255,255,.08);font-size:.82rem;text-align:center;
+  }
+
+  /* ===== MODAL ===== */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(10,20,40,.7);
+    backdrop-filter:blur(6px);
+    display:flex;align-items:center;justify-content:center;
+    padding:24px;z-index:2000;
+    opacity:0;visibility:hidden;transition:opacity .3s, visibility .3s;
+  }
+  .modal-overlay.active{opacity:1;visibility:visible;}
+  .modal{
+    background:#fff;border-radius:22px;
+    max-width:640px;width:100%;max-height:90vh;overflow-y:auto;
+    box-shadow:0 30px 80px rgba(0,0,0,.35);
+    transform:scale(.9) translateY(20px);transition:transform .35s cubic-bezier(.2,.9,.3,1.2);
+    position:relative;
+  }
+  .modal-overlay.active .modal{transform:scale(1) translateY(0);}
+  .modal-header{
+    padding:28px 32px 0;
+    display:flex;justify-content:space-between;align-items:flex-start;gap:20px;
+  }
+  .modal-header h3{
+    font-size:1.5rem;color:var(--primary-dark);font-weight:800;line-height:1.25;
+  }
+  .modal-icon{
+    width:56px;height:56px;border-radius:16px;display:grid;place-items:center;
+    font-size:1.6rem;flex-shrink:0;
+    background:linear-gradient(135deg,rgba(26,77,143,.1),rgba(0,184,169,.16));
+  }
+  .modal-close{
+    position:absolute;top:16px;right:16px;
+    width:38px;height:38px;border-radius:50%;border:none;
+    background:rgba(26,77,143,.08);color:var(--primary);
+    font-size:1.3rem;cursor:pointer;display:grid;place-items:center;
+    transition:background .2s, transform .2s;
+  }
+  .modal-close:hover{background:rgba(26,77,143,.16);transform:rotate(90deg);}
+  .modal-body{padding:20px 32px 32px;color:var(--muted);font-size:.98rem;line-height:1.75;}
+  .modal-body p{margin-bottom:14px;}
+  .modal-body ul{list-style:none;margin:14px 0;}
+  .modal-body ul li{
+    padding-left:26px;position:relative;margin-bottom:10px;color:var(--text);
+  }
+  .modal-body ul li::before{
+    content:'✓';position:absolute;left:0;top:0;
+    color:var(--accent);font-weight:800;
+  }
+  .modal-body .highlight{
+    background:linear-gradient(135deg,rgba(26,77,143,.06),rgba(0,184,169,.08));
+    border-left:4px solid var(--accent);padding:16px 20px;border-radius:10px;
+    margin:18px 0;color:var(--text);
+  }
+  .modal-body .stats-row{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0;
+  }
+  .modal-body .stat-box{
+    background:#f5f8fc;border-radius:12px;padding:16px;text-align:center;
+  }
+  .modal-body .stat-box b{display:block;font-size:1.4rem;color:var(--primary);font-weight:800;}
+  .modal-body .stat-box span{font-size:.8rem;color:var(--muted);}
+  .modal-actions{
+    display:flex;gap:12px;margin-top:24px;flex-wrap:wrap;
+  }
+
+  /* ===== FORM ===== */
+  .form-group{margin-bottom:18px;}
+  .form-group label{
+    display:block;font-size:.88rem;font-weight:600;color:var(--primary-dark);
+    margin-bottom:8px;
+  }
+  .form-group input, .form-group select{
+    width:100%;padding:13px 16px;border-radius:12px;
+    border:2px solid rgba(26,77,143,.12);background:#f9fbfe;
+    font-family:inherit;font-size:.95rem;color:var(--text);
+    transition:border .2s, box-shadow .2s;
+  }
+  .form-group input:focus, .form-group select:focus{
+    outline:none;border-color:var(--accent);
+    box-shadow:0 0 0 4px rgba(0,184,169,.15);
+    background:#fff;
+  }
+  .form-group .error{
+    display:none;font-size:.82rem;color:#e53935;margin-top:6px;
+  }
+  .form-group.invalid input, .form-group.invalid select{border-color:#e53935;}
+  .form-group.invalid .error{display:block;}
+  .form-success{
+    display:none;text-align:center;padding:30px 20px;
+  }
+  .form-success.show{display:block;}
+  .form-success .check{
+    width:80px;height:80px;border-radius:50%;margin:0 auto 20px;
+    background:linear-gradient(135deg,var(--accent),#00d4c2);
+    display:grid;place-items:center;color:#fff;font-size:2.5rem;
+    animation:pop .5s cubic-bezier(.2,.9,.3,1.4);
+  }
+  @keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+  .form-success h3{color:var(--primary-dark);margin-bottom:10px;}
+  .form-success p{color:var(--muted);}
+
+  /* ===== QUIZ ===== */
+  .quiz-question{margin-bottom:24px;}
+  .quiz-question h4{
+    font-size:1.05rem;color:var(--primary-dark);margin-bottom:14px;
+  }
+  .quiz-options{display:grid;gap:10px;}
+  .quiz-option{
+    padding:14px 18px;border-radius:12px;background:#f5f8fc;
+    border:2px solid transparent;cursor:pointer;
+    transition:border .2s, background .2s, transform .15s;
+    font-size:.95rem;color:var(--text);
+  }
+  .quiz-option:hover{background:#eaf1fb;transform:translateX(4px);}
+  .quiz-option.selected{border-color:var(--accent);background:rgba(0,184,169,.1);font-weight:600;}
+  .quiz-result{
+    display:none;text-align:center;padding:20px;
+  }
+  .quiz-result.show{display:block;}
+  .quiz-score{
+    font-size:3rem;font-weight:800;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  }
+
+  /* Reveal */
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity .7s ease, transform .7s ease;}
+  .reveal.active{opacity:1;transform:translateY(0);}
+
+  /* Back to top */
+  .to-top{
+    position:fixed;bottom:26px;right:26px;width:52px;height:52px;
+    border-radius:50%;border:none;cursor:pointer;
+    background:linear-gradient(135deg,var(--primary),var(--accent));
+    color:#fff;font-size:1.3rem;display:grid;place-items:center;
+    box-shadow:0 10px 30px rgba(26,77,143,.4);
+    opacity:0;visibility:hidden;transform:translateY(20px);
+    transition:opacity .3s, visibility .3s, transform .3s;z-index:900;
+  }
+  .to-top.show{opacity:1;visibility:visible;transform:translateY(0);}
+  .to-top:hover{transform:translateY(-4px);}
+
+  /* ===== RESPONSIVE ===== */
+  @media(max-width:960px){
+    .hero-inner{grid-template-columns:1fr;text-align:center;}
+    .hero p{margin-left:auto;margin-right:auto;}
+    .hero-btns,.hero-stats{justify-content:center;}
+    .grid-3{grid-template-columns:1fr 1fr;}
+    .effect-grid{grid-template-columns:1fr;}
+    .footer-inner{grid-template-columns:1fr 1fr;}
+    .modal-body .stats-row{grid-template-columns:1fr;}
+  }
+  @media(max-width:720px){
+    .nav-links{
+      position:fixed;top:66px;right:0;left:0;background:#fff;
+      flex-direction:column;gap:0;padding:0 24px;
+      max-height:0;overflow:hidden;transition:max-height .35s ease;
+      box-shadow:0 10px 30px rgba(0,0,0,.08);
+    }
+    .nav-links.open{max-height:400px;padding:16px 24px 24px;}
+    .nav-links a{padding:12px 0;border-bottom:1px solid rgba(26,77,143,.06);}
+    .burger{display:flex;}
+    .nav .btn-primary{display:none;}
+    .grid-3,.grid-2{grid-template-columns:1fr;}
+    .func-table th:nth-child(1),.func-table td:nth-child(1){display:none;}
+    .footer-inner{grid-template-columns:1fr;}
+    section{padding:70px 20px;}
+    .modal-header,.modal-body{padding-left:22px;padding-right:22px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header id="header">
+  <nav class="nav">
+    <div class="logo" data-scroll="about">
+      <div class="logo-icon">🧠</div>
+      НЕЙРО-ФИТНЕС
+    </div>
+    <div class="nav-links" id="navLinks">
+      <a data-scroll="about">О проекте</a>
+      <a data-scroll="functions">Функции</a>
+      <a data-scroll="architecture">Архитектура</a>
+      <a data-scroll="scenarios">Сценарии</a>
+      <a data-scroll="roadmap">Внедрение</a>
+      <a data-scroll="effects">Эффекты</a>
+    </div>
+    <button class="btn btn-primary" data-modal="cta">Попробовать</button>
+    <button class="burger" id="burger" aria-label="Меню">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="about">
+  <div class="hero-inner">
+    <div>
+      <div class="badge">🚀 ИИ-тренажёр когнитивных функций</div>
+      <h1>Тренируй мозг — <span>сохраняй ясность</span> на долгие годы</h1>
+      <p>
+        «НЕЙРО-ФИТНЕС» — интеллектуальный помощник для восстановления и поддержания
+        памяти, внимания и мышления. Персонализированные программы, комплексный подход
+        и интеграция с врачами.
+      </p>
+      <div class="hero-btns">
+        <button class="btn btn-primary" data-modal="cta">Начать тренировки</button>
+        <button class="btn btn-outline" data-modal="how">Как это работает</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><b>2,1 млрд</b><span>людей 60+ к 2050 году</span></div>
+        <div class="stat"><b>55 млн</b><span>живут с деменцией</span></div>
+        <div class="stat"><b>15 мин</b><span>в день для результата</span></div>
+      </div>
+    </div>
+    <div class="brain-visual">
+      <div class="brain-circle">
+        <div class="orbit o1"><div class="orbit-dot"></div></div>
+        <div class="orbit o2"><div class="orbit-dot"></div></div>
+        <div class="brain-emoji">🧠</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== PROBLEM / IDEA ===== -->
+<section>
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="tag">Актуальность</div>
+      <h2>Почему это важно сегодня</h2>
+      <p>Нажмите на карточку, чтобы узнать подробнее.</p>
+    </div>
+    <div class="grid grid-3">
+      <div class="card clickable reveal" data-modal="card1">
+        <div class="card-icon">📈</div>
+        <h3>Рост продолжительности жизни</h3>
+        <p>Необходимость сохранять качество жизни и самостоятельность в старшем возрасте.</p>
+      </div>
+      <div class="card clickable reveal" data-modal="card2">
+        <div class="card-icon">🧩</div>
+        <h3>Когнитивные нарушения</h3>
+        <p>Деменция и болезнь Альцгеймера затрагивают более 55 млн человек в мире.</p>
+      </div>
+      <div class="card clickable reveal" data-modal="card3">
+        <div class="card-icon">🤖</div>
+        <h3>Нейротехнологии и ИИ</h3>
+        <p>Развитие ИИ открывает новые возможности для персонализированной нейрореабилитации.</p>
+      </div>
+      <div class="card clickable reveal" data-modal="card4">
+        <div class="card-icon">🇷🇺</div>
+        <h3>Импортозамещение</h3>
+        <p>Создание отечественной платформы вместо зарубежных медицинских сервисов.</p>
+      </div>
+      <div class="card clickable reveal" data-modal="card5">
+        <div class="card-icon">🏛️</div>
+        <h3>Господдержка</h3>
+        <p>Соответствие национальной программе «Активное долголетие» и «Демография».</p>
+      </div>
+      <div class="card clickable reveal" data-modal="card6">
+        <div class="card-icon">💡</div>
+        <h3>Уникальность решения</h3>
+        <p>Глубокая персонализация, комплексный подход и адаптивность в реальном времени.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FUNCTIONS ===== -->
+<section id="functions" style="background:linear-gradient(180deg,#f5f8fc,#eef4fb);">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="tag">Возможности</div>
+      <h2>Ключевые функции «НЕЙРО-ФИТНЕС»</h2>
+      <p>Нажмите на строку, чтобы увидеть подробное описание.</p>
+    </div>
+    <table class="func-table reveal">
+      <thead>
+        <tr><th>№</th><th>Функция</th><th>Описание</th></tr>
+      </thead>
+      <tbody>
+        <tr data-modal="f1"><td>1</td><td>Когнитивный профиль</td><td>Диагностика памяти, внимания и мышления за 15 минут</td></tr>
+        <tr data-modal="f2"><td>2</td><td>Персональная программа</td><td>Индивидуальный план тренировок на каждый день</td></tr>
+        <tr data-modal="f3"><td>3</td><td>Игровые упражнения</td><td>Тренировка памяти, внимания и логики в игровой форме</td></tr>
+        <tr data-modal="f4"><td>4</td><td>Комплексный подход</td><td>Рекомендации по физической активности, питанию и сну</td></tr>
+        <tr data-modal="f5"><td>5</td><td>Адаптивность</td><td>Программа меняется по мере прогресса пользователя</td></tr>
+        <tr data-modal="f6"><td>6</td><td>Мотивация</td><td>Геймификация, достижения и поддержка близких</td></tr>
+        <tr data-modal="f7"><td>7</td><td>Связь с врачом</td><td>Отчёты для невролога и телемедицина</td></tr>
+        <tr data-modal="f8"><td>8</td><td>Ранняя диагностика</td><td>Выявление когнитивных нарушений на ранней стадии</td></tr>
+        <tr data-modal="f9"><td>9</td><td>Мультиязычность</td><td>Работа на 10+ языках</td></tr>
+        <tr data-modal="f10"><td>10</td><td>Доступность</td><td>Смартфон, планшет, компьютер и голосовой помощник</td></tr>
+      </tbody>
+    </table>
+    <div style="text-align:center;margin-top:36px;">
+      <button class="btn btn-primary" data-modal="quiz">🧠 Пройти мини-тест на память</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ARCHITECTURE ===== -->
+<section id="architecture">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="tag">Технологии</div>
+      <h2>Архитектура решения</h2>
+      <p>Нажмите на слой, чтобы узнать подробности.</p>
+    </div>
+    <div class="arch">
+      <div class="arch-layer reveal" data-modal="a1">
+        <div class="arch-num">1</div>
+        <div><h4>Интерфейсный слой</h4><p>Мобильное приложение, веб-версия, голосовой помощник</p></div>
+      </div>
+      <div class="arch-layer reveal" data-modal="a2">
+        <div class="arch-num">2</div>
+        <div><h4>Слой когнитивной диагностики</h4><p>Оценка памяти, внимания и мышления</p></div>
+      </div>
+      <div class="arch-layer reveal" data-modal="a3">
+        <div class="arch-num">3</div>
+        <div><h4>Слой персонализации</h4><p>Подбор индивидуальной программы тренировок</p></div>
+      </div>
+      <div class="arch-layer reveal" data-modal="a4">
+        <div class="arch-num">4</div>
+        <div><h4>Слой адаптации</h4><p>Изменение программы по мере прогресса</p></div>
+      </div>
+      <div class="arch-layer reveal" data-modal="a5">
+        <div class="arch-num">5</div>
+        <div><h4>Слой мотивации</h4><p>Геймификация, достижения, поддержка близких</p></div>
+      </div>
+      <div class="arch-layer reveal" data-modal="a6">
+        <div class="arch-num">6</div>
+        <div><h4>Слой интеграции</h4><p>Связь с врачом, родственниками и носимыми устройствами</p></div>
+      </div>
+      <div class="arch-layer reveal" data-modal="a7">
+        <div class="arch-num">7</div>
+        <div><h4>Слой безопасности</h4><p>Шифрование, GDPR/152-ФЗ, локальный хостинг</p></div>
+      </div>
+    </div>
+    <div class="grid grid-3" style="margin-top:40px;">
+      <div class="card clickable reveal" data-modal="tech1"><h3>🧠 LLM</h3><p>GPT-4o / YandexGPT / GigaChat / Llama 3</p></div>
+      <div class="card clickable reveal" data-modal="tech2"><h3>📚 RAG</h3><p>Векторная база знаний нейропсихологии</p></div>
+      <div class="card clickable reveal" data-modal="tech3"><h3>⚙️ Платформа</h3><p>Python (FastAPI) + React Native, REST API</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SCENARIOS ===== -->
+<section id="scenarios" style="background:linear-gradient(180deg,#eef4fb,#f5f8fc);">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="tag">Практика</div>
+      <h2>Сценарии использования</h2>
+      <p>Нажмите на сценарий, чтобы увидеть полное описание.</p>
+    </div>
+    <div class="grid grid-2">
+      <div class="scenario reveal" data-modal="s1">
+        <div class="num">01</div>
+        <h3>Профилактика</h3>
+        <p>Пользователь 55 лет хочет сохранить ясность ума...</p>
+        <span class="more">Читать полностью →</span>
+      </div>
+      <div class="scenario reveal" data-modal="s2">
+        <div class="num">02</div>
+        <h3>Восстановление после инсульта</h3>
+        <p>Пользователь 68 лет проходит реабилитацию...</p>
+        <span class="more">Читать полностью →</span>
+      </div>
+      <div class="scenario reveal" data-modal="s3">
+        <div class="num">03</div>
+        <h3>Поддержка близких</h3>
+        <p>Дочь пользователя 78 лет получает уведомления...</p>
+        <span class="more">Читать полностью →</span>
+      </div>
+      <div class="scenario reveal" data-modal="s4">
+        <div class="num">04</div>
+        <h3>Ранняя диагностика</h3>
+        <p>«НЕЙРО-ФИТНЕС» замечает снижение когнитивных функций...</p>
+        <span class="more">Читать полностью →</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ROADMAP ===== -->
+<section id="roadmap">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="tag">План</div>
+      <h2>Этапы внедрения и масштабирования</h2>
+      <p>Нажмите на этап, чтобы узнать результат.</p>
+    </div>
+    <div class="grid grid-2" style="align-items:start;">
+      <div class="timeline reveal">
+        <div class="tl-item" data-modal="t1">
+          <h4>Аналитический этап <span class="term">1 мес</span></h4>
+          <p>Исследование потребностей, анализ решений, формирование требований.</p>
+        </div>
+        <div class="tl-item" data-modal="t2">
+          <h4>Проектирование <span class="term">1 мес</span></h4>
+          <p>Архитектура, сценарии взаимодействия, база знаний.</p>
+        </div>
+        <div class="tl-item" data-modal="t3">
+          <h4>Разработка MVP <span class="term">2 мес</span></h4>
+          <p>Прототип с базовыми упражнениями и диагностикой.</p>
+        </div>
+        <div class="tl-item" data-modal="t4">
+          <h4>Пилотное внедрение <span class="term">3 мес</span></h4>
+          <p>Тестирование на фокус-группе, сбор метрик эффективности.</p>
+        </div>
+        <div class="tl-item" data-modal="t5">
+          <h4>Доработка <span class="term">2 мес</span></h4>
+          <p>Расширение функциональности, добавление новых языков.</p>
+        </div>
+        <div class="tl-item" data-modal="t6">
+          <h4>Масштабирование <span class="term">6 мес</span></h4>
+          <p>Внедрение в 10 регионах, релиз мобильного приложения.</p>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="card clickable" data-modal="mech" style="margin-bottom:20px;">
+          <h3>🤝 Механизмы внедрения</h3>
+          <p style="margin-top:10px;">Партнёрство с медицинскими и геронтологическими центрами, интеграция с системами здравоохранения.</p>
+        </div>
+        <div class="card clickable" data-modal="scale">
+          <h3>📈 Масштабирование</h3>
+          <p style="margin-top:10px;">Люди старшего возраста, пациенты после инсульта, дети с задержкой развития, спортсмены.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== EFFECTS ===== -->
+<section id="effects" style="background:linear-gradient(180deg,#eef4fb,#f5f8fc);">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="tag">Результаты</div>
+      <h2>Ожидаемые эффекты</h2>
+      <p>Нажмите на показатель, чтобы узнать подробнее.</p>
+    </div>
+    <div class="effect-grid">
+      <div class="effect reveal" data-modal="e1"><div class="ico">🧠</div><div><b>30–50%</b><span>замедление снижения когнитивных функций</span></div></div>
+      <div class="effect reveal" data-modal="e2"><div class="ico">🛡️</div><div><b>20–40%</b><span>снижение риска развития деменции</span></div></div>
+      <div class="effect reveal" data-modal="e3"><div class="ico">😊</div><div><b>15–25 пунктов</b><span>повышение качества жизни</span></div></div>
+      <div class="effect reveal" data-modal="e4"><div class="ico">⏳</div><div><b>5–10 лет</b><span>увеличение продолжительности активной жизни</span></div></div>
+      <div class="effect reveal" data-modal="e5"><div class="ico">🏥</div><div><b>10–20%</b><span>снижение нагрузки на систему здравоохранения</span></div></div>
+      <div class="effect reveal" data-modal="e6"><div class="ico">👍</div><div><b>20–30%</b><span>рост удовлетворённости пользователей</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section id="cta">
+  <div class="container">
+    <div class="cta reveal">
+      <h2>Начните тренировать мозг уже сегодня</h2>
+      <p>Присоединяйтесь к пилотной программе «НЕЙРО-ФИТНЕС» и получите персональный план когнитивного долголетия.</p>
+      <button class="btn btn-primary" data-modal="cta">Записаться на пилот</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <div class="footer-inner">
+    <div>
+      <div class="logo" style="color:#fff;margin-bottom:14px;" data-scroll="about">
+        <div class="logo-icon">🧠</div> НЕЙРО-ФИТНЕС
+      </div>
+      <p>ИИ-тренажёр для восстановления и поддержания когнитивных функций. Профилактика деменции и активное долголетие.</p>
+    </div>
+    <div>
+      <h4>Разделы</h4>
+      <ul>
+        <li><a data-scroll="about">О проекте</a></li>
+        <li><a data-scroll="functions">Функции</a></li>
+        <li><a data-scroll="architecture">Архитектура</a></li>
+        <li><a data-scroll="scenarios">Сценарии</a></li>
+        <li><a data-scroll="roadmap">Внедрение</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4>Источники</h4>
+      <ul>
+        <li><a data-modal="src1">ФЗ № 152-ФЗ «О персональных данных»</a></li>
+        <li><a data-modal="src2">Нацпроект «Демография»</a></li>
+        <li><a data-modal="src3">ВОЗ. Доклад о старении, 2024</a></li>
+        <li><a data-modal="src4">McKinsey. Brain health, 2024</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    © 2025 НЕЙРО-ФИТНЕС. Конкурсная работа. Номинация «Технологии здоровьесбережения и долголетия».
+  </div>
+</footer>
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" role="dialog" aria-modal="true">
+    <button class="modal-close" id="modalClose" aria-label="Закрыть">✕</button>
+    <div class="modal-header">
+      <div class="modal-icon" id="modalIcon">🧠</div>
+      <h3 id="modalTitle">Заголовок</h3>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<!-- Back to top -->
+<button class="to-top" id="toTop" aria-label="Наверх">↑</button>
+
+<script>
+/* ============================================================
+   ДАННЫЕ ДЛЯ МОДАЛЬНЫХ ОКОН
+   ============================================================ */
+const MODALS = {
+  /* --- CTA / форма записи --- */
+  cta: {
+    icon: '🚀',
+    title: 'Запись на пилотную программу',
+    html: `
+      <p>Заполните форму — мы свяжемся с вами, когда откроется набор в пилотную группу «НЕЙРО-ФИТНЕС».</p>
+      <form id="signupForm" novalidate>
+        <div class="form-group" id="grpName">
+          <label for="fName">Ваше имя *</label>
+          <input type="text" id="fName" placeholder="Иван Иванов" autocomplete="name">
+          <div class="error">Пожалуйста, введите имя (минимум 2 символа).</div>
+        </div>
+        <div class="form-group" id="grpEmail">
+          <label for="fEmail">Email *</label>
+          <input type="email" id="fEmail" placeholder="ivan@example.com" autocomplete="email">
+          <div class="error">Введите корректный email.</div>
+        </div>
+        <div class="form-group" id="grpPhone">
+          <label for="fPhone">Телефон</label>
+          <input type="tel" id="fPhone" placeholder="+7 (___) ___-__-__" autocomplete="tel">
+          <div class="error">Введите корректный номер телефона.</div>
+        </div>
+        <div class="form-group" id="grpRole">
+          <label for="fRole">Кто вы? *</label>
+          <select id="fRole">
+            <option value="">— Выберите —</option>
+            <option>Пользователь 55+</option>
+            <option>Родственник</option>
+            <option>Врач / специалист</option>
+            <option>Представитель клиники</option>
+            <option>Инвестор / партнёр</option>
+          </select>
+          <div class="error">Пожалуйста, выберите вариант.</div>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn btn-primary">Отправить заявку</button>
+        </div>
+      </form>
+      <div class="form-success" id="formSuccess">
+        <div class="check">✓</div>
+        <h3>Спасибо! Заявка отправлена</h3>
+        <p>Мы свяжемся с вами по указанным контактам, когда откроется набор в пилотную группу.</p>
+      </div>
+    `
+  },
+
+  /* --- Как это работает --- */
+  how: {
+    icon: '⚙️',
+    title: 'Как работает «НЕЙРО-ФИТНЕС»',
+    html: `
+      <p>Всего 4 шага — от первой диагностики до устойчивого прогресса:</p>
+      <ul>
+        <li><b>Шаг 1. Диагностика (15 минут).</b> Система оценивает память, внимание, мышление и скорость реакции, строит ваш когнитивный профиль.</li>
+        <li><b>Шаг 2. Персональный план.</b> ИИ подбирает упражнения под ваш возраст, состояние здоровья и цели — профилактика, реабилитация или поддержание формы.</li>
+        <li><b>Шаг 3. Ежедневные тренировки.</b> 15 минут в день в игровой форме. Программа адаптируется в реальном времени: сложность растёт вместе с вашим прогрессом.</li>
+        <li><b>Шаг 4. Контроль и поддержка.</b> Отчёты для врача, уведомления для близких, рекомендации по физической активности, питанию и сну.</li>
+      </ul>
+      <div class="highlight">
+        <b>Комплексный подход:</b> когнитивный тренинг + физическая активность + социализация + питание — именно сочетание даёт максимальный эффект.
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary" data-modal="cta">Записаться на пилот</button>
+      </div>
+    `
+  },
+
+  /* --- Карточки актуальности --- */
+  card1: {
+    icon: '📈',
+    title: 'Рост продолжительности жизни',
+    html: `
+      <p>Средняя продолжительность жизни в России и мире steadily растёт. По данным ВОЗ, к 2050 году число людей старше 60 лет достигнет <b>2,1 миллиарда человек</b>.</p>
+      <p>Главный вызов — не просто жить дольше, а сохранять <b>качество жизни</b>: самостоятельность, социальную активность, ясность ума.</p>
+      <div class="stats-row">
+        <div class="stat-box"><b>2,1 млрд</b><span>людей 60+ к 2050</span></div>
+        <div class="stat-box"><b>+5–10 лет</b><span>активной жизни</span></div>
+        <div class="stat-box"><b>15 мин</b><span>в день</span></div>
+      </div>
+    `
+  },
+  card2: {
+    icon: '🧩',
+    title: 'Когнитивные нарушения и деменция',
+    html: `
+      <p>Деменция и болезнь Альцгеймера затрагивают <b>более 55 миллионов человек</b> в мире, и эта цифра продолжает расти.</p>
+      <p>Одна из главных угроз активного долголетия — снижение когнитивных функций: памяти, внимания, мышления, скорости реакции.</p>
+      <div class="highlight">
+        <b>Важно:</b> когнитивные функции можно и нужно тренировать. Нейропластичность мозга сохраняется в любом возрасте.
+      </div>
+    `
+  },
+  card3: {
+    icon: '🤖',
+    title: 'Нейротехнологии и искусственный интеллект',
+    html: `
+      <p>Развитие ИИ открывает новые возможности для <b>персонализированной нейрореабилитации</b>:</p>
+      <ul>
+        <li>адаптивные алгоритмы подбора упражнений;</li>
+        <li>анализ когнитивного профиля в реальном времени;</li>
+        <li>голосовые помощники (STT + TTS);</li>
+        <li>интеграция с медицинскими данными и носимыми устройствами.</li>
+      </ul>
+      <p>«НЕЙРО-ФИТНЕС» использует современные LLM (GPT-4o, YandexGPT, GigaChat, Llama 3) и RAG-базу знаний по нейропсихологии.</p>
+    `
+  },
+  card4: {
+    icon: '🇷🇺',
+    title: 'Импортозамещение',
+    html: `
+      <p>Большинство зарубежных платформ когнитивного тренинга (Lumosity, BrainHQ, Elevate, Peak, NeuroNation) недоступны или ограничены в России.</p>
+      <p>«НЕЙРО-ФИТНЕС» — <b>отечественное решение</b>, построенное на российских и открытых технологиях:</p>
+      <ul>
+        <li>YandexGPT / GigaChat;</li>
+        <li>Yandex SpeechKit для голоса;</li>
+        <li>локальный хостинг и соответствие 152-ФЗ;</li>
+        <li>поддержка русского языка и 10+ других.</li>
+      </ul>
+    `
+  },
+  card5: {
+    icon: '🏛️',
+    title: 'Государственная поддержка',
+    html: `
+      <p>Проект соответствует ключевым государственным инициативам:</p>
+      <ul>
+        <li>Национальная программа «Активное долголетие»;</li>
+        <li>Национальный проект «Демография»;</li>
+        <li>Национальная программа «Цифровая экономика РФ»;</li>
+        <li>ФЗ № 152-ФЗ «О персональных данных».</li>
+      </ul>
+      <div class="highlight">
+        Особую значимость проект приобретает в контексте роста продолжительности жизни в России и задач по укреплению технологического суверенитета.
+      </div>
+    `
+  },
+  card6: {
+    icon: '💡',
+    title: 'Уникальность решения',
+    html: `
+      <p>«НЕЙРО-ФИТНЕС» отличается от аналогов по 7 ключевым параметрам:</p>
+      <ul>
+        <li><b>Глубокая персонализация</b> — анализ когнитивного профиля и подбор индивидуальной программы.</li>
+        <li><b>Комплексный подход</b> — не только упражнения, но и рекомендации по образу жизни.</li>
+        <li><b>Адаптивность</b> — программа меняется в зависимости от прогресса.</li>
+        <li><b>Мотивация</b> — геймификация, достижения, поддержка близких.</li>
+        <li><b>Интеграция с медициной</b> — связь с врачом и медицинскими данными.</li>
+        <li><b>Профилактика деменции</b> — раннее выявление когнитивных нарушений.</li>
+        <li><b>Отечественные технологии</b> — соответствие политике импортозамещения.</li>
+      </ul>
+    `
+  },
+
+  /* --- Функции --- */
+  f1: {icon:'🧪', title:'Когнитивный профиль', html:`<p>Диагностика памяти, внимания, мышления и скорости реакции всего за <b>15 минут</b>. По результатам строится индивидуальный когнитивный профиль с сильными и слабыми зонами.</p><ul><li>Оценка кратковременной и долговременной памяти;</li><li>Тесты на устойчивость и переключаемость внимания;</li><li>Логические и аналитические задачи;</li><li>Сравнение с возрастной нормой.</li></ul>`},
+  f2: {icon:'📋', title:'Персональная программа', html:`<p>На основе когнитивного профиля ИИ составляет <b>индивидуальный план тренировок на каждый день</b>.</p><ul><li>Учёт возраста и состояния здоровья;</li><li>Разная сложность для разных когнитивных сфер;</li><li>Рекомендации по длительности и времени занятий;</li><li>Автоматическая корректировка плана.</li></ul>`},
+  f3: {icon:'🎮', title:'Игровые упражнения', html:`<p>Тренировка памяти, внимания и логики в <b>игровой форме</b> — чтобы заниматься было интересно и не скучно.</p><ul><li>Запоминание последовательностей и образов;</li><li>Поиск пар и логических связей;</li><li>Задачи на скорость реакции;</li><li>Упражнения на пространственное мышление.</li></ul>`},
+  f4: {icon:'🌿', title:'Комплексный подход', html:`<p>Помимо когнитивных упражнений — <b>рекомендации по образу жизни</b>, которые усиливают эффект тренировок.</p><ul><li>Физическая активность (прогулки, гимнастика);</li><li>Питание для здоровья мозга;</li><li>Гигиена сна;</li><li>Социальная активность и общение.</li></ul>`},
+  f5: {icon:'🔄', title:'Адаптивность', html:`<p>Программа <b>меняется по мере прогресса</b> пользователя.</p><ul><li>Автоматическое повышение сложности;</li><li>Возврат к более простым упражнениям при затруднениях;</li><li>Учёт усталости и регулярности занятий;</li><li>Адаптация под изменения в состоянии здоровья.</li></ul>`},
+  f6: {icon:'🏆', title:'Мотивация', html:`<p>Геймификация и поддержка помогают <b>не бросить тренировки</b>.</p><ul><li>Достижения и уровни;</li><li>Ежедневные цели и серии;</li><li>Уведомления и напоминания;</li><li>Поддержка близких через приложение.</li></ul>`},
+  f7: {icon:'👨‍⚕️', title:'Связь с врачом', html:`<p>Отчёты для невролога и <b>телемедицина</b>.</p><ul><li>Выгрузка когнитивного профиля;</li><li>Динамика показателей во времени;</li><li>Рекомендации врача прямо в приложении;</li><li>Интеграция с медицинскими системами.</li></ul>`},
+  f8: {icon:'🔍', title:'Ранняя диагностика', html:`<p>Система <b>замечает снижение когнитивных функций</b> на ранней стадии и рекомендует обратиться к неврологу.</p><ul><li>Отслеживание динамики показателей;</li><li>Сигналы при устойчивом ухудшении;</li><li>Рекомендации по обследованию;</li><li>Помощь в раннем выявлении деменции.</li></ul>`},
+  f9: {icon:'🌍', title:'Мультиязычность', html:`<p>Работа на <b>10+ языках</b> — для пользователей из разных регионов и стран.</p><ul><li>Русский, английский, татарский, башкирский и др.;</li><li>Локализация интерфейса и упражнений;</li><li>Голосовой помощник на разных языках.</li></ul>`},
+  f10: {icon:'📱', title:'Доступность', html:`<p>Работа на <b>смартфоне, планшете, компьютере</b> и через голосового помощника.</p><ul><li>Мобильное приложение (React Native);</li><li>Веб-версия;</li><li>Голосовое управление для пожилых;</li><li>Крупный шрифт и контрастный интерфейс.</li></ul>`},
+
+  /* --- Архитектура --- */
+  a1: {icon:'🖥️', title:'Слой 1. Интерфейсный', html:`<p>Точки контакта пользователя с системой:</p><ul><li>Мобильное приложение (React Native);</li><li>Веб-версия для ПК и планшета;</li><li>Голосовой помощник (Whisper STT + Yandex SpeechKit TTS);</li><li>Крупный шрифт и адаптация под пожилых пользователей.</li></ul>`},
+  a2: {icon:'🧪', title:'Слой 2. Когнитивная диагностика', html:`<p>Оценка памяти, внимания, мышления и скорости реакции.</p><ul><li>Валидированные нейропсихологические методики;</li><li>Автоматический подсчёт результатов;</li><li>Построение когнитивного профиля;</li><li>Сравнение с возрастной нормой.</li></ul>`},
+  a3: {icon:'🎯', title:'Слой 3. Персонализация', html:`<p>Подбор индивидуальной программы тренировок.</p><ul><li>Анализ сильных и слабых когнитивных зон;</li><li>Учёт возраста, здоровья, целей;</li><li>Формирование ежедневного плана;</li><li>Рекомендации по образу жизни.</li></ul>`},
+  a4: {icon:'🔄', title:'Слой 4. Адаптация', html:`<p>Изменение программы по мере прогресса.</p><ul><li>ML-алгоритмы подбора упражнений;</li><li>Динамическая сложность;</li><li>Реакция на усталость и пропуски;</li><li>Пересмотр плана при изменениях здоровья.</li></ul>`},
+  a5: {icon:'🏆', title:'Слой 5. Мотивация', html:`<p>Геймификация и поддержка.</p><ul><li>Достижения, уровни, серии дней;</li><li>Ежедневные цели;</li><li>Уведомления и напоминания;</li><li>Поддержка близких через приложение.</li></ul>`},
+  a6: {icon:'🔗', title:'Слой 6. Интеграция', html:`<p>Связь с врачом, родственниками и устройствами.</p><ul><li>REST API для медицинских систем;</li><li>Телемедицина;</li><li>Носимые устройства и фитнес-трекеры;</li><li>Нейроинтерфейсы (перспективно).</li></ul>`},
+  a7: {icon:'🔒', title:'Слой 7. Безопасность', html:`<p>Защита персональных данных.</p><ul><li>Шифрование данных;</li><li>Соответствие GDPR и 152-ФЗ;</li><li>Локальный хостинг в РФ;</li><li>Разграничение доступа и аудит.</li></ul>`},
+  tech1: {icon:'🧠', title:'LLM — большие языковые модели', html:`<p>Основа для интеллектуального ядра системы:</p><ul><li><b>GPT-4o</b> — для сложных сценариев;</li><li><b>YandexGPT</b> — российская модель;</li><li><b>GigaChat</b> — российская модель;</li><li><b>Llama 3</b> — открытая модель для локального хостинга.</li></ul>`},
+  tech2: {icon:'📚', title:'RAG — база знаний', html:`<p>Векторная база знаний по нейропсихологии для точных ответов.</p><ul><li>Pinecone / Weaviate;</li><li>Научные статьи и методики;</li><li>Актуальные рекомендации врачей;</li><li>Регулярное обновление.</li></ul>`},
+  tech3: {icon:'⚙️', title:'Технологический стек', html:`<ul><li><b>Backend:</b> Python (FastAPI);</li><li><b>Frontend:</b> React Native;</li><li><b>ML:</b> адаптивные алгоритмы подбора упражнений;</li><li><b>Голос:</b> Whisper (STT) + Yandex SpeechKit (TTS);</li><li><b>Интеграции:</b> REST API, медицинские системы, носимые устройства;</li><li><b>Безопасность:</b> шифрование, GDPR/152-ФЗ, локальный хостинг.</li></ul>`},
+
+  /* --- Сценарии --- */
+  s1: {icon:'🛡️', title:'Сценарий 1. Профилактика', html:`<p><b>Пользователь:</b> 55 лет, хочет сохранить ясность ума.</p><p>«НЕЙРО-ФИТНЕС» проводит диагностику, выявляет сильные и слабые зоны, составляет программу на 3 месяца:</p><ul><li>15 минут когнитивных упражнений в день;</li><li>30 минут прогулки;</li><li>рекомендации по питанию;</li><li>еженедельный контроль прогресса.</li></ul><div class="highlight">Цель — не допустить снижения когнитивных функций и сохранить активность на долгие годы.</div>`},
+  s2: {icon:'🏥', title:'Сценарий 2. Восстановление после инсульта', html:`<p><b>Пользователь:</b> 68 лет, проходит реабилитацию.</p><p>«НЕЙРО-ФИТНЕС» адаптирует программу под его состояние:</p><ul><li>тренировка памяти и внимания в щадящем режиме;</li><li>учёт усталости и медицинских ограничений;</li><li>передача отчётов врачу;</li><li>постепенное повышение сложности.</li></ul><div class="highlight">Интеграция с медицинскими данными позволяет согласовать тренировки с лечащим врачом.</div>`},
+  s3: {icon:'👨‍👩‍👧', title:'Сценарий 3. Поддержка близких', html:`<p><b>Пользователь:</b> 78 лет. <b>Дочь:</b> активный помощник.</p><p>Дочь получает уведомления о прогрессе отца и может:</p><ul><li>видеть ежедневную активность;</li><li>поддерживать и мотивировать;</li><li>получать рекомендации врача;</li><li>общаться через приложение.</li></ul><div class="highlight">Это снижает тревожность родственников и укрепляет семейные связи.</div>`},
+  s4: {icon:'🔍', title:'Сценарий 4. Ранняя диагностика', html:`<p>«НЕЙРО-ФИТНЕС» постоянно отслеживает динамику когнитивных функций.</p><p>При устойчивом снижении показателей система:</p><ul><li>формирует сигнал для пользователя;</li><li>рекомендует обратиться к неврологу;</li><li>предоставляет выгрузку для врача;</li><li>помогает выявить нарушения на ранней стадии.</li></ul><div class="highlight">Раннее выявление — ключ к эффективной профилактике деменции.</div>`},
+
+  /* --- Этапы --- */
+  t1: {icon:'🔎', title:'Аналитический этап (1 месяц)', html:`<p><b>Результат:</b> понимание рынка и требований.</p><ul><li>Исследование потребностей целевых групп;</li><li>Анализ существующих решений (Lumosity, BrainHQ, Elevate, Peak, NeuroNation);</li><li>Формирование функциональных требований;</li><li>Оценка конкурентных преимуществ.</li></ul>`},
+  t2: {icon:'📐', title:'Проектирование (1 месяц)', html:`<p><b>Результат:</b> готовая архитектура и сценарии.</p><ul><li>Проектирование 7 слоёв архитектуры;</li><li>Разработка сценариев взаимодействия;</li><li>Формирование базы знаний по нейропсихологии;</li><li>Выбор технологического стека.</li></ul>`},
+  t3: {icon:'💻', title:'Разработка MVP (2 месяца)', html:`<p><b>Результат:</b> работающий прототип.</p><ul><li>Базовые когнитивные упражнения;</li><li>Диагностика когнитивного профиля;</li><li>Персональный план тренировок;</li><li>Минимальный интерфейс и голосовой помощник.</li></ul>`},
+  t4: {icon:'🧪', title:'Пилотное внедрение (3 месяца)', html:`<p><b>Результат:</b> проверка гипотез на реальных пользователях.</p><ul><li>Тестирование на фокус-группе;</li><li>Сбор метрик эффективности;</li><li>Обратная связь от пользователей и врачей;</li><li>Выявление узких мест.</li></ul>`},
+  t5: {icon:'🛠️', title:'Доработка (2 месяца)', html:`<p><b>Результат:</b> расширенная функциональность.</p><ul><li>Учёт замечаний пилота;</li><li>Добавление новых языков;</li><li>Расширение библиотеки упражнений;</li><li>Улучшение интеграций с медициной.</li></ul>`},
+  t6: {icon:'🚀', title:'Масштабирование (6 месяцев)', html:`<p><b>Результат:</b> выход на широкую аудиторию.</p><ul><li>Внедрение в 10 регионах России;</li><li>Релиз мобильного приложения;</li><li>Партнёрства с клиниками и геронтологическими центрами;</li><li>Модель SaaS и локальная установка.</li></ul>`},
+  mech: {icon:'🤝', title:'Механизмы внедрения', html:`<ul><li>Партнёрство с медицинскими и геронтологическими центрами;</li><li>Интеграция с системами здравоохранения;</li><li>Обучение персонала работе с системой;</li><li>Обеспечение технической поддержки и обновления;</li><li>Разработка регламентов использования и политики обработки данных;</li><li>Оценка экономической эффективности и возврата инвестиций;</li><li>Создание системы мониторинга качества тренировок;</li><li>Регулярное обновление базы знаний и сценариев.</li></ul>`},
+  scale: {icon:'📈', title:'Масштабирование решения', html:`<p>Решение может быть адаптировано для:</p><ul><li>людей старшего возраста;</li><li>пациентов после инсульта и черепно-мозговых травм;</li><li>людей с когнитивными нарушениями;</li><li>детей с задержкой развития;</li><li>спортсменов для повышения концентрации;</li><li>работников умственного труда для профилактики выгорания;</li><li>людей, желающих сохранить ясность ума на долгие годы.</li></ul><div class="highlight">Модели: SaaS-подписка и локальная установка в медицинских учреждениях.</div>`},
+
+  /* --- Эффекты --- */
+  e1: {icon:'🧠', title:'Замедление снижения когнитивных функций', html:`<p>Регулярные тренировки по программе «НЕЙРО-ФИТНЕС» позволяют замедлить возрастное снижение когнитивных функций на <b>30–50%</b>.</p><ul><li>Улучшение памяти и внимания;</li><li>Повышение скорости реакции;</li><li>Сохранение логического мышления.</li></ul>`},
+  e2: {icon:'🛡️', title:'Снижение риска деменции', html:`<p>Комплексный подход (когнитивный тренинг + физическая активность + социализация + питание) снижает риск развития деменции на <b>20–40%</b>.</p><div class="highlight">Наиболее эффективна профилактика, начатая до появления выраженных нарушений.</div>`},
+  e3: {icon:'😊', title:'Повышение качества жизни', html:`<p>Пользователи отмечают улучшение качества жизни на <b>15–25 пунктов</b> по субъективным шкалам.</p><ul><li>Сохранение самостоятельности;</li><li>Активная социальная жизнь;</li><li>Снижение тревожности;</li><li>Улучшение настроения.</li></ul>`},
+  e4: {icon:'⏳', title:'Увеличение активной жизни', html:`<p>Продолжительность активной жизни увеличивается на <b>5–10 лет</b>.</p><p>Это означает больше лет без потери самостоятельности, с ясным умом и возможностью вести привычный образ жизни.</p>`},
+  e5: {icon:'🏥', title:'Снижение нагрузки на здравоохранение', html:`<p>Профилактика и раннее выявление когнитивных нарушений позволяют снизить нагрузку на систему здравоохранения на <b>10–20%</b>.</p><ul><li>Меньше случаев тяжёлой деменции;</li><li>Меньше потребности в стационарном уходе;</li><li>Экономия бюджетных средств.</li></ul>`},
+  e6: {icon:'👍', title:'Удовлетворённость пользователей', html:`<p>Рост удовлетворённости пользователей на <b>20–30%</b> за счёт:</p><ul><li>понятного интерфейса;</li><li>геймификации и мотивации;</li><li>реальных результатов;</li><li>поддержки близких и врачей.</li></ul>`},
+
+  /* --- Источники --- */
+  src1: {icon:'📜', title:'ФЗ № 152-ФЗ', html:`<p><b>Федеральный закон от 27.07.2006 № 152-ФЗ «О персональных данных».</b></p><p>Регулирует обработку персональных данных в России. «НЕЙРО-ФИТНЕС» соответствует требованиям закона: шифрование, согласие пользователя, локальный хостинг.</p>`},
+  src2: {icon:'🏛️', title:'Национальный проект «Демография»', html:`<p><b>Программа «Активное долголетие».</b></p><p>Направлена на повышение качества жизни старшего поколения, поддержание активности и здоровья. «НЕЙРО-ФИТНЕС» соответствует целям программы.</p>`},
+  src3: {icon:'🌍', title:'ВОЗ. Доклад о старении и здоровье, 2024', html:`<p><b>Всемирная организация здравоохранения.</b></p><p>Доклад о старении и здоровье (2024) подтверждает рост числа людей 60+ до 2,1 млрд к 2050 году и необходимость профилактики когнитивных нарушений.</p>`},
+  src4: {icon:'📊', title:'McKinsey. The future of brain health, 2024', html:`<p><b>Отчёт McKinsey.</b></p><p>«The future of brain health: AI and neurotechnology» (2024) — аналитика рынка нейротехнологий и роли ИИ в профилактике когнитивных нарушений.</p>`}
+};
+
+/* ============================================================
+   МОДАЛЬНОЕ ОКНО
+   ============================================================ */
+const overlay = document.getElementById('modalOverlay');
+const modalTitle = document.getElementById('modalTitle');
+const modalBody = document.getElementById('modalBody');
+const modalIcon = document.getElementById('modalIcon');
+const modalClose = document.getElementById('modalClose');
+
+function openModal(key){
+  const data = MODALS[key];
+  if(!data) return;
+  modalTitle.textContent = data.title;
+  modalBody.innerHTML = data.html;
+  modalIcon.textContent = data.icon || '🧠';
+  overlay.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  // Привязка формы, если есть
+  const form = document.getElementById('signupForm');
+  if(form) attachFormHandler(form);
+  // Привязка кнопок внутри модалки (data-modal)
+  modalBody.querySelectorAll('[data-modal]').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const k = btn.getAttribute('data-modal');
+      setTimeout(() => openModal(k), 150);
+    });
+  });
+}
+
+function closeModal(){
+  overlay.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+modalClose.addEventListener('click', closeModal);
+overlay.addEventListener('click', (e) => {
+  if(e.target === overlay) closeModal();
+});
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape' && overlay.classList.contains('active')) closeModal();
+});
+
+/* ============================================================
+   ДЕЛЕГИРОВАНИЕ data-modal
+   ============================================================ */
+document.addEventListener('click', (e) => {
+  const trigger = e.target.closest('[data-modal]');
+  if(trigger){
+    e.preventDefault();
+    const key = trigger.getAttribute('data-modal');
+    openModal(key);
+  }
+});
+
+/* ============================================================
+   ПЛАВНЫЙ СКРОЛЛ data-scroll
+   ============================================================ */
+document.addEventListener('click', (e) => {
+  const trigger = e.target.closest('[data-scroll]');
+  if(trigger){
+    e.preventDefault();
+    const id = trigger.getAttribute('data-scroll');
+    const target = document.getElementById(id);
+    if(target){
+      const offset = 80;
+      const top = target.getBoundingClientRect().top + window.pageYOffset - offset;
+      window.scrollTo({ top, behavior: 'smooth' });
+      // Закрыть мобильное меню
+      navLinks.classList.remove('open');
+      burger.classList.remove('open');
+    }
+  }
+});
+
+/* ============================================================
+   ФОРМА
+   ============================================================ */
+function attachFormHandler(form){
+  const success = document.getElementById('formSuccess');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let valid = true;
+
+    const name = document.getElementById('fName');
+    const email = document.getElementById('fEmail');
+    const phone = document.getElementById('fPhone');
+    const role = document.getElementById('fRole');
+
+    // Валидация имени
+    if(name.value.trim().length < 2){
+      document.getElementById('grpName').classList.add('invalid');
+      valid = false;
+    } else {
+      document.getElementById('grpName').classList.remove('invalid');
+    }
+
+    // Валидация email
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!emailRe.test(email.value.trim())){
+      document.getElementById('grpEmail').classList.add('invalid');
+      valid = false;
+    } else {
+      document.getElementById('grpEmail').classList.remove('invalid');
+    }
+
+    // Валидация телефона (необязательно, но если заполнен — проверить)
+    if(phone.value.trim() && !/^[\d\s\+\-\(\)]{7,}$/.test(phone.value.trim())){
+      document.getElementById('grpPhone').classList.add('invalid');
+      valid = false;
+    } else {
+      document.getElementById('grpPhone').classList.remove('invalid');
+    }
+
+    // Валидация роли
+    if(!role.value){
+      document.getElementById('grpRole').classList.add('invalid');
+      valid = false;
+    } else {
+      document.getElementById('grpRole').classList.remove('invalid');
+    }
+
+    if(valid){
+      form.style.display = 'none';
+      success.classList.add('show');
+      // Можно отправить данные на сервер:
+      console.log('Заявка:', {
+        name: name.value.trim(),
+        email: email.value.trim(),
+        phone: phone.value.trim(),
+        role: role.value
+      });
+    }
+  });
+
+  // Сброс ошибок при вводе
+  form.querySelectorAll('input, select').forEach(field => {
+    field.addEventListener('input', () => {
+      field.closest('.form-group').classList.remove('invalid');
+    });
+  });
+}
+
+/* ============================================================
+   МИНИ-ТЕСТ НА ПАМЯТЬ
+   ============================================================ */
+const QUIZ_HTML = `
+  <p>Проверьте свою память за 1 минуту. Отвечайте честно — это не экзамен!</p>
+  <div id="quizContainer">
+    <div class="quiz-question" data-q="1">
+      <h4>1. Запомните: <b>7 — 2 — 9 — 4</b>. Какая цифра была третьей?</h4>
+      <div class="quiz-options">
+        <div class="quiz-option" data-correct="false">7</div>
+        <div class="quiz-option" data-correct="false">2</div>
+        <div class="quiz-option" data-correct="true">9</div>
+        <div class="quiz-option" data-correct="false">4</div>
+      </div>
+    </div>
+    <div class="quiz-question" data-q="2">
+      <h4>2. Какое слово НЕ относится к фруктам?</h4>
+      <div class="quiz-options">
+        <div class="quiz-option" data-correct="false">Яблоко</div>
+        <div class="quiz-option" data-correct="true">Морковь</div>
+        <div class="quiz-option" data-correct="false">Банан</div>
+        <div class="quiz-option" data-correct="false">Груша</div>
+      </div>
+    </div>
+    <div class="quiz-question" data-q="3">
+      <h4>3. Продолжите последовательность: 2, 4, 8, 16, ...</h4>
+      <div class="quiz-options">
+        <div class="quiz-option" data-correct="false">18</div>
+        <div class="quiz-option" data-correct="false">24</div>
+        <div class="quiz-option" data-correct="true">32</div>
+        <div class="quiz-option" data-correct="false">20</div>
+      </div>
+    </div>
+  </div>
+  <div class="quiz-result" id="quizResult">
+    <div class="quiz-score" id="quizScore">0/3</div>
+    <p id="quizMessage" style="margin-top:10px;color:var(--muted);"></p>
+    <div class="modal-actions" style="justify-content:center;">
+      <button class="btn btn-primary" data-modal="cta">Хочу полноценную диагностику</button>
+    </div>
+  </div>
+`;
+
+// Расширяем MODALS после объявления
+MODALS.quiz = {
+  icon: '🧠',
+  title: 'Мини-тест на память и внимание',
+  html: QUIZ_HTML
+};
+
+// Обработка кликов по вариантам
+document.addEventListener('click', (e) => {
+  const option = e.target.closest('.quiz-option');
+  if(!option) return;
+  const question = option.closest('.quiz-question');
+  if(!question || question.dataset.answered === 'true') return;
+
+  // Подсветка выбора
+  question.querySelectorAll('.quiz-option').forEach(o => o.classList.remove('selected'));
+  option.classList.add('selected');
+  question.dataset.answered = 'true';
+  question.dataset.correct = option.dataset.correct;
+
+  // Проверка: все ли вопросы отвечены
+  const allQuestions = document.querySelectorAll('#quizContainer .quiz-question');
+  const answered = document.querySelectorAll('#quizContainer .quiz-question[data-answered="true"]');
+  if(allQuestions.length === answered.length){
+    let score = 0;
+    answered.forEach(q => { if(q.dataset.correct === 'true') score++; });
+    setTimeout(() => {
+      const result = document.getElementById('quizResult');
+      const scoreEl = document.getElementById('quizScore');
+      const msgEl = document.getElementById('quizMessage');
+      if(result && scoreEl){
+        result.classList.add('show');
+        scoreEl.textContent = score + '/' + allQuestions.length;
+        if(score === allQuestions.length){
+          msgEl.textContent = 'Отличный результат! Ваша память и внимание в прекрасной форме. Продолжайте тренироваться!';
+        } else if(score >= 2){
+          msgEl.textContent = 'Хороший результат! Регулярные тренировки помогут поддерживать и улучшать показатели.';
+        } else {
+          msgEl.textContent = 'Есть над чем поработать. «НЕЙРО-ФИТНЕС» составит для вас персональную программу.';
+        }
+      }
+    }, 400);
+  }
+});
+
+/* ============================================================
+   МОБИЛЬНОЕ МЕНЮ
+   ============================================================ */
+const burger = document.getElementById('burger');
+const navLinks = document.getElementById('navLinks');
+burger.addEventListener('click', () => {
+  navLinks.classList.toggle('open');
+  burger.classList.toggle('open');
+});
+
+/* ============================================================
+   HEADER SHADOW + BACK TO TOP
+   ============================================================ */
+const header = document.getElementById('header');
+const toTop = document.getElementById('toTop');
+window.addEventListener('scroll', () => {
+  const scrolled = window.scrollY > 20;
+  header.classList.toggle('scrolled', scrolled);
+  toTop.classList.toggle('show', window.scrollY > 500);
+});
+toTop.addEventListener('click', () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+/* ============================================================
+   REVEAL ON SCROLL
+   ============================================================ */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if(e.isIntersecting){
+      e.target.classList.add('active');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
